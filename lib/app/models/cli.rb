@@ -9,8 +9,8 @@ class CLI
         username = gets.chomp.downcase.titleize
         puts "Please enter a location"
         location = gets.chomp.downcase.titleize #how do you make the second word capitolized?
-        check = User.find_by(username: username, location: location)
-        if check
+        user_instance = User.find_by(username: username, location: location)
+        if user_instance
             puts "Welcome back  looks like you already have an acount with us, lets take you to the main menu"
         else
             gender = gender_menu
@@ -61,11 +61,11 @@ class CLI
         if menu_choice == 'Rate an officer'
             rate_officer(user_instance)
         elsif menu_choice == 'View officer average rating'
-            get_average_rating
+            get_average_rating(user_instance)
         elsif menu_choice == 'Change your rating'
-            change_rating
+            change_rating(user_instance)
         elsif menu_choice == 'Delete previous review'
-            delete_review
+            delete_review(user_instance)
         #   elsif welcome == 'Delete last rating'
             # delete_rating
 
@@ -107,7 +107,7 @@ class CLI
         main_menu(user_instance)
     end
 
-    def get_average_rating
+    def get_average_rating(user_instance)
         prompt = TTY::Prompt.new
 
         officer_choices = Officer.all.collect{|officer| officer.officer_name }
@@ -127,11 +127,33 @@ class CLI
     end
 
 
-    # def change_rating
+    def change_rating(user_instance)
+        prompt = TTY::Prompt.new
+        #.update
+        #user_reviews ==reviews.id
+        
+        #active record update
+        # Review.all.select {|review| review.id == user.id}
+        ## tty select review from matching
+        #user chooses review
+        # do another rating on selected
+        #update selected review
+        binding.pry
+        updated_review = Review.all.select {|review| review.user_id == user_instance.id}
+        
+        # officer_choices = Officer.all.select {|officer| officer.id == updated_review.officer_id}
 
-    # end
+        id_numbers = updated_review.map {|review|review.officer_id}
 
-    # def delete_review
+        officer_choices = updated_review.find_by(officer_id: )
+
+        officer =  prompt.select("please select your review to update:", updated_review, cycle: true , echo: false, filter: true)
+
+
+
+    end
+
+    # def delete_review(user_instance)
         
     # end
 
