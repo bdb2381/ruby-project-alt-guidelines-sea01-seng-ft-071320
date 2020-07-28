@@ -1,10 +1,10 @@
-user1= User.create(username:"Daniel", password: "123", location: "West Seattle", race:"White", gender:"M")
-user2= User.create(username:"Lucas", password: "123", location:"Capitol Hill", race:"White", gender:"M")
-user3= User.create(username:"Brad", password: "123", location:"Snohomish", race:"White", gender:"M")
-user4= User.create(username:"Jeff", password: "123", location:"Greenlake", race:"Black",gender:"M ")
-user5= User.create(username:"Lucy", password: "123", location:"Everett ", race:"Asian",gender:"F")
-user6= User.create(username:"Rachel", password: "123", location:"Eastlake", race:"Hispanic",gender:"F")
-user6= User.create(username:"Todd", password: "123", location:"Greenlake", race:"Black", gender:"M")
+user1= User.create(username:"Daniel",location: "West Seattle", race:"White", gender:"M")
+user2= User.create(username:"Lucas",location:"Capitol Hill", race:"White", gender:"M")
+user3= User.create(username:"Brad",location:"Snohomish", race:"White", gender:"M")
+user4= User.create(username:"Jeff",location:"Greenlake", race:"Black",gender:"M ")
+user5= User.create(username:"Lucy",location:"Everett ", race:"Asian",gender:"F")
+user6= User.create(username:"Rachel",location:"Eastlake", race:"Hispanic",gender:"F")
+user6= User.create(username:"Todd",location:"Greenlake", race:"Black", gender:"M")
 
 
 # t.string :officer_name
