@@ -131,18 +131,13 @@ class CLI
 
     def change_rating(user_instance)
         # binding.pry
-        prompt = TTY::Prompt.new
-        #.update
-        #user_reviews ==reviews.id
         
-        #active record update
-        # Review.all.select {|review| review.id == user.id}
-        ## tty select review from matching
-        #user chooses review
-        # do another rating on selected
-        #update selected review
+        prompt = TTY::Prompt.new
+      
 
-        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        user_reviews = Review.find_by(user_id: user_instance)
+        if user_reviews
+            reviews = Review.all.select {|review| review.user_id == user_instance.id}
         
         # take update_review officer_id and match to id in Officer table, return officer name
         officer_names = reviews.map {|review| review.officer.officer_name}
@@ -164,31 +159,47 @@ class CLI
 
         puts "You have updated your rating of #{officer_selection} to #{rating}"
 
+
+        else
+            puts "It looks like you have not made any reviews yet. Let's take you back to the main menu"
+        end
         main_menu(user_instance)
     end
 
     def delete_review(user_instance)
         prompt = TTY::Prompt.new
-        #review.all.select {|review| review.user_id == user_instance.id
-        #select officer (tty prompt)
-        reviews = Review.all.select {|review| review.user_id == user_instance.id}
-        #selecting all reviews of officers that match reviews by user
-        officer_names = reviews.map {|review| review.officer.officer_name}
-       #return names as array of strings
-        officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)
-        #tty menu
-        officer_review = reviews.select {|review| review.officer.officer_name == officer}
-        #returns review instance associated with the name entered above
-        officer_x = Officer.find_by(officer_name: officer)
-        #matching officer instance
-       
+        
+        user_reviews = Review.find_by(user_id: user_instance)
+        if user_reviews 
 
-        review_id = officer_review.map {|review| review.id}
-        #finds id for review instance
-        Review.destroy(review_id[0]) #rating: rating, review_desc: review_desc)    
-        #deletes review.
-        puts "you have deleted your rating of #{officer}"
-        main_menu(user_instance)
+            #review.all.select {|review| review.user_id == user_instance.id
+            #select officer (tty prompt)
+            reviews = Review.all.select {|review| review.user_id == user_instance.id}
+            #selecting all reviews of officers that match reviews by user
+            officer_names = reviews.map {|review| review.officer.officer_name}
+            #return names as array of strings
+            officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)
+            #tty menu
+            officer_review = reviews.select {|review| review.officer.officer_name == officer}
+            #returns review instance associated with the name entered above
+            officer_x = Officer.find_by(officer_name: officer)
+            #matching officer instance
+        
+
+            review_id = officer_review.map {|review| review.id}
+            #finds id for review instance
+            Review.destroy(review_id[0]) #rating: rating, review_desc: review_desc)    
+            #deletes review.
+            puts "you have deleted your rating of #{officer}"
+           
+        else 
+            puts "It looks like you do not have any reviews to delete. Lets take you back to the main menu"
+    end
+    main_menu(user_instance)
     end
 
 end
+
+
+
+
