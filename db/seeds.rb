@@ -129,3 +129,5 @@ review2342  = Review.create(user: User.all.sample, officer: Officer.all.sample, 
 review32421  = Review.create(user: User.all.sample, officer: Officer.all.sample, rating: 6, review_desc: "Fair")
 review2342  = Review.create(user: User.all.sample, officer: Officer.all.sample, rating: 3, review_desc: "Rough")
 review234  = Review.create(user: User.all.sample, officer: Officer.all.sample, rating: 1, review_desc: "Violent")
+
+puts "it seeded"
