@@ -98,8 +98,9 @@ class CLI
         puts "You chose #{@officer_instance.officer_name}. Please rate your interaction with the Officer."
         
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
-        
-        review_desc = "good" # need to write out method for review desc
+    
+        puts "Please include a descrition of your interaction with #{@officer_instance.officer_name}."
+        review_desc = gets.chomp # need to write out method for review desc
         
         @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         
@@ -151,8 +152,9 @@ class CLI
         puts "Please update your rating for #{officer_selection}"
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
 
-        review_desc = "good" # need to write out method for review desc
-
+        puts "Please include a descrition of your interaction with #{@officer_instance.officer_name}."
+        review_desc = gets.chomp 
+     
         review_id = officer_review.map {|review| review.id}
 
         Review.update(review_id[0], rating: rating, review_desc: review_desc)    
