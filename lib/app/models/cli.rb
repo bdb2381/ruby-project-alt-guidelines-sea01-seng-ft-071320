@@ -1,6 +1,7 @@
 class CLI
     def welcome
         puts "Welcome to (APP NAME)"
+        # binding.pry
         login_menu
     end
 
@@ -52,7 +53,7 @@ class CLI
         menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| sleep 1
             menu.choice 'Rate an officer'
             menu.choice 'View officer average rating'
-            menu.choice 'Change your rating'
+            menu.choice 'Change a previous review'
             menu.choice 'Delete previous review'
             # menu.choice 'Delete last rating'
             menu.choice 'Exit'
@@ -62,7 +63,7 @@ class CLI
             rate_officer(user_instance)
         elsif menu_choice == 'View officer average rating'
             get_average_rating(user_instance)
-        elsif menu_choice == 'Change your rating'
+        elsif menu_choice == 'Change a previous review'
             change_rating(user_instance)
         elsif menu_choice == 'Delete previous review'
             delete_review(user_instance)
@@ -108,6 +109,7 @@ class CLI
     end
 
     def get_average_rating(user_instance)
+
         prompt = TTY::Prompt.new
 
         officer_choices = Officer.all.collect{|officer| officer.officer_name }
@@ -128,6 +130,7 @@ class CLI
 
 
     def change_rating(user_instance)
+        # binding.pry
         prompt = TTY::Prompt.new
         #.update
         #user_reviews ==reviews.id
@@ -139,18 +142,18 @@ class CLI
         # do another rating on selected
         #update selected review
 
-        updated_review = Review.all.select {|review| review.user_id == user_instance.id}
+        reviews = Review.all.select {|review| review.user_id == user_instance.id}
         
         # take update_review officer_id and match to id in Officer table, return officer name
-        officer_names = updated_review.map {|review| review.officer.officer_name}
+        officer_names = reviews.map {|review| review.officer.officer_name}
        
-        officer =  prompt.select("Please select your review to update:", officer_names, cycle: true , echo: false, filter: true)
+        officer_selection =  prompt.select("Please select your review to update:", officer_names, cycle: true , echo: false, filter: true)
 
-        officer_review = updated_review.select {|review| review.officer.officer_name == officer}
+        officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
 
-        officer_x = Officer.find_by(officer_name: officer)
+        officer_x = Officer.find_by(officer_name: officer_selection)
 
-        puts "Please update your rating for #{officer}"
+        puts "Please update your rating for #{officer_selection}"
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
 
         review_desc = "good" # need to write out method for review desc
@@ -159,13 +162,33 @@ class CLI
 
         Review.update(review_id[0], rating: rating, review_desc: review_desc)    
 
-        puts "You updated your rating"
+        puts "You have updated your rating of #{officer_selection} to #{rating}"
 
         main_menu(user_instance)
     end
 
-    # def delete_review(user_instance)
-        
-    # end
+    def delete_review(user_instance)
+        prompt = TTY::Prompt.new
+        #review.all.select {|review| review.user_id == user_instance.id
+        #select officer (tty prompt)
+        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        #selecting all reviews of officers that match reviews by user
+        officer_names = reviews.map {|review| review.officer.officer_name}
+       #return names as array of strings
+        officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)
+        #tty menu
+        officer_review = reviews.select {|review| review.officer.officer_name == officer}
+        #returns review instance associated with the name entered above
+        officer_x = Officer.find_by(officer_name: officer)
+        #matching officer instance
+       
+
+        review_id = officer_review.map {|review| review.id}
+        #finds id for review instance
+        Review.destroy(review_id[0]) #rating: rating, review_desc: review_desc)    
+        #deletes review.
+        puts "you have deleted your rating of #{officer}"
+        main_menu(user_instance)
+    end
 
 end
