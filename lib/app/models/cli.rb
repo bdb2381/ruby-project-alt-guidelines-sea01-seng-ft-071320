@@ -138,19 +138,30 @@ class CLI
         #user chooses review
         # do another rating on selected
         #update selected review
-        binding.pry
+
         updated_review = Review.all.select {|review| review.user_id == user_instance.id}
         
-        # officer_choices = Officer.all.select {|officer| officer.id == updated_review.officer_id}
+        # take update_review officer_id and match to id in Officer table, return officer name
+        officer_names = updated_review.map {|review| review.officer.officer_name}
+       
+        officer =  prompt.select("Please select your review to update:", officer_names, cycle: true , echo: false, filter: true)
 
-        id_numbers = updated_review.map {|review|review.officer_id}
+        officer_review = updated_review.select {|review| review.officer.officer_name == officer}
 
-        officer_choices = updated_review.find_by(officer_id: )
+        officer_x = Officer.find_by(officer_name: officer)
 
-        officer =  prompt.select("please select your review to update:", updated_review, cycle: true , echo: false, filter: true)
+        puts "Please update your rating for #{officer}"
+        rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
 
+        review_desc = "good" # need to write out method for review desc
 
+        review_id = officer_review.map {|review| review.id}
 
+        Review.update(review_id[0], rating: rating, review_desc: review_desc)    
+
+        puts "You updated your rating"
+
+        main_menu(user_instance)
     end
 
     # def delete_review(user_instance)
