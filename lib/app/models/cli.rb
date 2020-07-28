@@ -74,10 +74,23 @@ class CLI
         end
     end
 
-    def rate_officer
-        binding.pry
-    end
 
+    #     brewery_name = prompt.select("Choose a brewery to rate:", choices, cycle: true, echo: false, filter: true)
+    # @brewery = Brewery.find_by(name: brewery_name)
+    def rate_officer(username)  # (create an officer)
+        # provide number rating and provide menu of text options
+        # table: officers 
+    # :officer_name, :badge_number,  :preicient, :unit, :rank 
+    # able to review only officiers alreayd in the DB as the DB hosts all officiers in the DB    
+        officer_choices = Officer.all.collect{|officer| officer.name }
+        officer_name = promp.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true)
+        @officer = Officer.find_by(name: officer_name)
+        puts "You chose #{@officer.officer_name}. Please rate your interaction with the Officer."
+        rating = Prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
+        review_desc = "good"
+        @review = Review.create(user: username, officer: @officer, rating: rating, review_desc: review_desc)
+        end
+    end
     def get_average_rating
 
     end

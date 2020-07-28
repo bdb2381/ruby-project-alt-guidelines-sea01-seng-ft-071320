@@ -21,10 +21,10 @@ ActiveRecord::Schema.define(version: 2020_07_27_215132) do
   end
 
   create_table "reviews", force: :cascade do |t|
-    t.float "rating"
-    t.string "review_desc"
     t.integer "user_id"
     t.integer "officer_id"
+    t.float "rating"
+    t.string "review_desc"
   end
 
   create_table "users", force: :cascade do |t|
