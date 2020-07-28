@@ -87,25 +87,29 @@ class CLI
     def rate_officer(user_instance)  # (create an officer)
     
         prompt = TTY::Prompt.new
-        binding.pry
+
         officer_choices = Officer.all.collect{|officer| officer.officer_name }
         
         officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true)
 
-        @officer = Officer.find_by(officer_name: officer)
+        @officer_instance = Officer.find_by(officer_name: officer)
         
-        puts "You chose #{@officer.officer_name}. Please rate your interaction with the Officer."
+        puts "You chose #{@officer_instance.officer_name}. Please rate your interaction with the Officer."
         
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
         
-        # review_desc = "good" need to write out method for review desc
+        review_desc = "good" # need to write out method for review desc
         
-        @review = Review.create(user: user_instance, officer: @officer, rating: rating, review_desc: review_desc)
+        @review = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
+        
+        puts "Thank you #{user_instance.username} for your review of Officer #{@officer_instance.officer_name}"
+        puts "You have given them a review of #{rating}/10"
+        main_menu(user_instance)
     end
 
-    # def get_average_rating
+    def get_average_rating
 
-    # end
+    end
 
     # def change_rating
 
