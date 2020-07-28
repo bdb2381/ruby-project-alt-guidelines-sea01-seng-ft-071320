@@ -88,7 +88,7 @@ class CLI
     
         prompt = TTY::Prompt.new
 
-        officer_choices = Officer.all.collect{|officer| officer.officer_name }
+        officer_choices = Officer.all.collect{|officer| officer.officer_name } #-->make a helper mthod
         
         officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true)
 
@@ -100,7 +100,7 @@ class CLI
         
         review_desc = "good" # need to write out method for review desc
         
-        @review = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
+        @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         
         puts "Thank you #{user_instance.username} for your review of Officer #{@officer_instance.officer_name}"
         puts "You have given them a review of #{rating}/10"
@@ -108,8 +108,24 @@ class CLI
     end
 
     def get_average_rating
+        prompt = TTY::Prompt.new
 
+        officer_choices = Officer.all.collect{|officer| officer.officer_name }
+        
+        officer = prompt.select("Choose officer to veiw their average rating:", officer_choices, cycle: true , echo: false, filter: true)
+        
+        @officer_instance = Officer.find_by(officer_name: officer)
+       
+        officer_review_selection = Review.all.select {|review| review.officer_id == @officer_instance.id}
+
+        total_reviews = officer_review_selection.map {|review| review.rating}
+        avg_rating = total_reviews.sum / total_reviews.length
+        
+        puts "Officer #{@officer_instance.officer_name} has a average rating of #{avg_rating}."
+        
+        main_menu(user_instance)
     end
+
 
     # def change_rating
 
