@@ -83,24 +83,41 @@ class CLI
     def get_officer_instance
         Officer.all.collect{|officer| officer.officer_name} 
     end
+
+    def are_you_sure(user_instance)
+        prompt = TTY::Prompt.new
+        menu_choice = prompt.select("",cycle: true, echo: false) do |menu| sleep 1
+            menu.choice 'Yes'
+            menu.choice 'No',-> {main_menu(user_instance)}
+        end
+    end
         
     def rate_officer(user_instance)
         system "clear"
         puts render_banner
+        
         prompt = TTY::Prompt.new
+        
         officer_choices = get_officer_instance
         officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true).chomp
         @officer_instance = Officer.find_by(officer_name: officer)
         sleep 1
+        
         puts "You chose #{@officer_instance.officer_name}. Please rate your interaction with the Officer."
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
         puts "Please include a description of your interaction with #{@officer_instance.officer_name}:"
         review_desc = gets.chomp 
+
+        puts "Are you sure you want to submit this review?"
+        are_you_sure(user_instance)
+
         @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         sleep 1
+        
         puts "Thank you #{user_instance.username} for your review of Officer #{@officer_instance.officer_name}"
         puts "You have given them a review of #{rating}/10"
         sleep 3
+        
         main_menu(user_instance)
     end
 
@@ -158,9 +175,13 @@ class CLI
         review_desc = gets.chomp
         
         review_id = officer_review.map {|review| review.id}
+
+        puts "Are you sure you want to submit this updated review?"
+        are_you_sure(user_instance)
+        
         Review.update(review_id[0], rating: rating, review_desc: review_desc)
         
-        puts "You have updated your rating of #{officer_selection} to #{rating}."
+        puts "You have updated your review of #{officer_selection} to #{rating}."
         else
             puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
         end
@@ -185,6 +206,9 @@ class CLI
             officer_x = Officer.find_by(officer_name: officer) #matching officer instance
             review_id = officer_review.map {|review| review.id} #finds id for review instance
             
+            puts "Are you sure you want to delete this review?"
+            are_you_sure(user_instance)
+
             Review.destroy(review_id[0]) #deletes review.    
 
             sleep 1
