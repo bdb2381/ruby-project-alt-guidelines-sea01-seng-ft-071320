@@ -24,24 +24,18 @@ class CLI
 
     def gender_menu
         prompt = TTY::Prompt.new
-        gender = prompt.select("What is your gender?", cycle: true, echo: false, filter: true) do |menu| sleep 1
-            menu.choice 'F'
-            menu.choice 'M'
-        end
+        choices = {"M" => 1, "F" => 2}
+        gender = prompt.select("What is your gender?", choices, cycle: true, echo: false, filter: true)  
+        sleep 1
     end
 
     def demographic_menu
         prompt = TTY::Prompt.new
-        race = prompt.select("What is your gender?", cycle: true, echo: false, filter: true) do |menu| sleep 1
-            menu.choice 'Black'
-            menu.choice 'White'
-            menu.choice 'Asian'
-            menu.choice 'Hispanic'
-            menu.choice 'Other'   #option to add in a write in your own via TTY?
-        end
+        choices = {"Black" => 1, "White" => 2, "Asian" => 3, "Hispanic" => 4, "Other" => 5}
+        race = prompt.select("What is your race?", choices, cycle: true, echo: false, filter: true) 
+        sleep 1
     end
     
-
     def main_menu(user_instance)
         prompt = TTY::Prompt.new
         menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| sleep 1
@@ -53,15 +47,11 @@ class CLI
         end
     end
 
-
     def get_officer_instance
         Officer.all.collect{|officer| officer.officer_name} 
     end
         
-    
-    
     def rate_officer(user_instance)  
-    
         prompt = TTY::Prompt.new
         officer_choices = get_officer_instance
         officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true)
@@ -79,13 +69,11 @@ class CLI
     def get_average_rating(user_instance)
 
         prompt = TTY::Prompt.new
-
-        officer_choices = get_officer_instance
         
+        officer_choices = get_officer_instance
         officer = prompt.select("Choose officer to veiw their average rating:", officer_choices, cycle: true , echo: false, filter: true)
         
         @officer_instance = Officer.find_by(officer_name: officer)
-    
         officer_review_selection = Review.all.select {|review| review.officer_id == @officer_instance.id}
 
         total_reviews = officer_review_selection.map {|review| review.rating}
@@ -96,68 +84,64 @@ class CLI
         main_menu(user_instance)
     end
 
-
+    # def get_user_review_for_officers(user_instance)
+    #     reviews = Review.all.select {|review| review.user_id == user_instance.id}
+    #     #selecting all reviews of officers that match reviews by user
+    #     officer_names = reviews.map {|review| review.officer.officer_name}
+    #     #return names as array of strings
+    # end
+    
     def change_rating(user_instance)
+        # binding.pry
         prompt = TTY::Prompt.new
-        user_reviews = Review.find_by(user_id: user_instance)
-        if user_reviews
-            reviews = Review.all.select {|review| review.user_id == user_instance.id}
-        
-            # take update_review officer_id and match to id in Officer table, return officer name
-            officer_names = reviews.map {|review| review.officer.officer_name}
-        
-            officer_selection =  prompt.select("Please select your review to update:", officer_names, cycle: true , echo: false, filter: true)
-
-            officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
-
-            officer_x = Officer.find_by(officer_name: officer_selection)
-
-            puts "Please update your rating for #{officer_selection}"
-            rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
-
-            puts "Please include a descrition of your interaction with #{@officer_instance.officer_name}."
-            review_desc = gets.chomp 
-        
-            review_id = officer_review.map {|review| review.id}
-
-            Review.update(review_id[0], rating: rating, review_desc: review_desc)    
-
-            puts "You have updated your rating of #{officer_selection} to #{rating}"
-        else
-            puts "It looks like you have not made any reviews yet. Let's take you back to the main menu"
-        end
-
+        #.update
+        #user_reviews ==reviews.id
+        #active record update
+        # Review.all.select {|review| review.id == user.id}
+        ## tty select review from matching
+        #user chooses review
+        # do another rating on selected
+        #update selected review
+        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        # take update_review officer_id and match to id in Officer table, return officer name
+        officer_names = reviews.map {|review| review.officer.officer_name}
+        officer_selection =  prompt.select("Please select your review to update:", officer_names, cycle: true , echo: false, filter: true)
+        officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
+        officer_x = Officer.find_by(officer_name: officer_selection)
+        puts "Please update your rating for #{officer_selection}"
+        rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
+        puts "Please include a descrition of your interaction with #{@officer_instance.officer_name}."
+        review_desc = gets.chomp 
+        review_id = officer_review.map {|review| review.id}
+        Review.update(review_id[0], rating: rating, review_desc: review_desc)    
+        puts "You have updated your rating of #{officer_selection} to #{rating}"
         main_menu(user_instance)
     end
+    
 
     def delete_review(user_instance)
         prompt = TTY::Prompt.new
-        
-        user_reviews = Review.find_by(user_id: user_instance)
-        if user_reviews 
-            #review.all.select {|review| review.user_id == user_instance.id
-            #select officer (tty prompt)
-            reviews = Review.all.select {|review| review.user_id == user_instance.id}
-            #selecting all reviews of officers that match reviews by user
-            officer_names = reviews.map {|review| review.officer.officer_name}
-            #return names as array of strings
-            officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)
-            #tty menu
-            officer_review = reviews.select {|review| review.officer.officer_name == officer}
-            #returns review instance associated with the name entered above
-            officer_x = Officer.find_by(officer_name: officer)
-            #matching officer instance
-            review_id = officer_review.map {|review| review.id}
-            #finds id for review instance
-            Review.destroy(review_id[0]) #rating: rating, review_desc: review_desc)    
-            #deletes review.
-            puts "you have deleted your rating of #{officer}"
-        else 
-            puts "It looks like you do not have any reviews to delete. Lets take you back to the main menu"
-        end
-        
+        #review.all.select {|review| review.user_id == user_instance.id
+        #select officer (tty prompt)
+        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        #selecting all reviews of officers that match reviews by user
+        officer_names = reviews.map {|review| review.officer.officer_name}
+        #return names as array of strings
+        officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)
+        #tty menu
+        officer_review = reviews.select {|review| review.officer.officer_name == officer}
+        #returns review instance associated with the name entered above
+        officer_x = Officer.find_by(officer_name: officer)
+        #matching officer instance
+        review_id = officer_review.map {|review| review.id}
+        #finds id for review instance
+        Review.destroy(review_id[0]) #rating: rating, review_desc: review_desc)    
+        #deletes review.
+        puts "you have deleted your rating of #{officer}"
         main_menu(user_instance)
     end
+    
+    
 
 end #END OF CLASS
 
