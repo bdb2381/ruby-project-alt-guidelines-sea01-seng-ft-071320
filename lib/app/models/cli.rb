@@ -1,3 +1,4 @@
+require 'colorize'
 class CLI
 
     def welcome 
@@ -22,19 +23,17 @@ class CLI
     def login_menu
         system "clear"
         puts render_banner
-        puts "To get started, please enter a username:"
+        puts "To get started, please enter a username:".blue.bold
         username = gets.chomp.downcase.titleize
-        puts "Please enter a location:"
+        puts "Please enter a location:".blue.bold
         location = gets.chomp.downcase.titleize 
         user_instance = User.find_by(username: username, location: location)
         if user_instance
-            puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"
-        else
+            puts "Welcome back looks like you already have an acount with us, lets take you to the Main Men    else
             gender = gender_menu
             race = demographic_menu
             user_instance = User.create(username: username, location: location, race: race, gender: gender)
-            puts "Thanks for setting up an account!"
-        end
+            puts "Thanks for setting up an accoun    end
         sleep 2
         main_menu(user_instance)
     end 
@@ -71,7 +70,7 @@ class CLI
         system "clear"
         puts render_banner
         prompt = TTY::Prompt.new
-        menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| 
+        menu_choice = prompt.select("Please select from the folowing options".blue.bold + " #{user_instance.username}".red.bold, cycle: true, echo: false) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
             menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
             menu.choice 'Change a previous review',-> {change_rating(user_instance)}
@@ -99,23 +98,25 @@ class CLI
         prompt = TTY::Prompt.new
         
         officer_choices = get_officer_instance
-        officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true).chomp
+        officer = prompt.select("Choose an officer to rate:".blue.bold, officer_choices, cycle: true , echo: false, filter: true).chomp
         @officer_instance = Officer.find_by(officer_name: officer)
         sleep 1
         
-        puts "You chose #{@officer_instance.officer_name}. Please rate your interaction with the Officer."
+        puts "You chose:" + " #{@officer_instance.officer_name}".red.bold  
+        puts "Please rate your interaction with the Officer.".blue.bold
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
-        puts "Please include a description of your interaction with #{@officer_instance.officer_name}:"
+        puts "_____________________________________________________________________________________________"
+        puts "Please include a description of your interaction with".blue.bold + "#{@officer_instance.officer_name}".red.bold + ":".blue.bold
         review_desc = gets.chomp 
 
-        puts "Are you sure you want to submit this review?"
+        puts "Are you sure you want to submit this review?".blue.bold
         are_you_sure(user_instance)
 
         @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         sleep 1
         
-        puts "Thank you #{user_instance.username} for your review of Officer #{@officer_instance.officer_name}"
-        puts "You have given them a review of #{rating}/10"
+        puts "Thank you" + " #{user_instance.username}".red.bold + " for your review of Officer" + " #{@officer_instance.officer_name}".red.bold + "."
+        puts "You have given them a review of:" + "#{rating}/10".red.bold
         sleep 3
         
         main_menu(user_instance)
@@ -127,7 +128,7 @@ class CLI
         prompt = TTY::Prompt.new
         
         officer_choices = get_officer_instance
-        officer = prompt.select("Choose officer to veiw their average rating:", officer_choices, cycle: true , echo: false, filter: true)
+        officer = prompt.select("Choose officer to veiw their average rating:".blue.bold, officer_choices, cycle: true , echo: false, filter: true)
         
         @officer_instance = Officer.find_by(officer_name: officer)
         officer_review_selection = Review.all.select {|review| review.officer_id == @officer_instance.id}
@@ -137,7 +138,7 @@ class CLI
 
         sleep 1
         
-        puts "Officer #{@officer_instance.officer_name} has a average rating of #{avg_rating}."
+        puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" " #{avg_rating}.".red.bold
 
         sleep 3
         
