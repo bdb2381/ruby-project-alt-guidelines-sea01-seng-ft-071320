@@ -2,13 +2,17 @@ class CLI
 
     def welcome 
         system "clear"
-        font = TTY::Font.new(:starwars)
-        puts font.write("                                     Welcome           to")
-        puts font.write("                 GOOD   COP      ||       bad   cop")
-        sleep 4
+        puts render_ascii_art
+        sleep 5
         login_menu
     end
 
+    def render_ascii_art
+        File.readlines("ascii.txt") do |line|
+            puts line
+        end
+    end
+    
     def login_menu
         system "clear"
         puts "To get started, please enter a username:"
@@ -42,6 +46,7 @@ class CLI
     end
     
     def main_menu(user_instance)
+
         system "clear"
         prompt = TTY::Prompt.new
         menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| sleep 1
