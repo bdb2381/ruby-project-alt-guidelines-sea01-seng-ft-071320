@@ -1,9 +1,11 @@
 class CLI
 
-    def welcome
+    def welcome 
         system "clear"
-        puts "Welcome to (APP NAME)" 
-        sleep 3
+        font = TTY::Font.new(:starwars)
+        puts font.write("                                     Welcome           to")
+        puts font.write("                 GOOD   COP      ||       bad   cop")
+        sleep 4
         login_menu
     end
 
