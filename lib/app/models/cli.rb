@@ -35,7 +35,7 @@ class CLI
             user_instance = User.create(username: username, location: location, race: race, gender: gender)
             puts "Thanks for setting up an account!"
         end
-        sleep 3
+        sleep 2
         main_menu(user_instance)
     end 
 
@@ -52,17 +52,31 @@ class CLI
         race = prompt.select("What is your race?", choices, cycle: true, echo: false, filter: true) 
     end
     
+    def render_exit
+        File.readlines("exit.txt") do |line|
+            puts line
+        end
+    end
+    
+    def exit
+        system "clear"
+        puts render_exit
+        sleep 3.5
+        system "clear"
+        exit!
+    end
+    
     def main_menu(user_instance)
 
         system "clear"
         puts render_banner
         prompt = TTY::Prompt.new
-        menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| sleep 1
+        menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
             menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
             menu.choice 'Change a previous review',-> {change_rating(user_instance)}
             menu.choice 'Delete previous review',-> {delete_review(user_instance)}
-            menu.choice 'Exit'
+            menu.choice 'Exit',-> {exit}
         end
     end
 
