@@ -13,8 +13,15 @@ class CLI
         end
     end
     
+    def render_banner
+        File.readlines("banner.txt") do |line|
+            puts line
+        end
+    end
+
     def login_menu
         system "clear"
+        puts render_banner
         puts "To get started, please enter a username:"
         username = gets.chomp.downcase.titleize
         puts "Please enter a location:"
@@ -48,6 +55,7 @@ class CLI
     def main_menu(user_instance)
 
         system "clear"
+        puts render_banner
         prompt = TTY::Prompt.new
         menu_choice = prompt.select("Please select from the folowing options #{user_instance.username}", cycle: true, echo: false) do |menu| sleep 1
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
@@ -64,6 +72,7 @@ class CLI
         
     def rate_officer(user_instance)
         system "clear"
+        puts render_banner
         prompt = TTY::Prompt.new
         officer_choices = get_officer_instance
         officer = prompt.select("Choose an officer to rate:", officer_choices, cycle: true , echo: false, filter: true).chomp
@@ -83,7 +92,7 @@ class CLI
 
     def get_average_rating(user_instance)
         system "clear"
-
+        puts render_banner
         prompt = TTY::Prompt.new
         
         officer_choices = get_officer_instance
@@ -113,6 +122,7 @@ class CLI
     
     def change_rating(user_instance)
         system "clear"
+        puts render_banner
         prompt = TTY::Prompt.new
 
         user_reviews = Review.find_by(user_id: user_instance)
@@ -147,6 +157,7 @@ class CLI
 
     def delete_review(user_instance)
         system "clear"
+        puts render_banner
         prompt = TTY::Prompt.new
 
         user_reviews = Review.find_by(user_id: user_instance)
