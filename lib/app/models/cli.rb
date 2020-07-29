@@ -58,7 +58,7 @@ class CLI
         @officer_instance = Officer.find_by(officer_name: officer)
         puts "You chose #{@officer_instance.officer_name}. Please rate your interaction with the Officer."
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
-        puts "Please include a descrition of your interaction with #{@officer_instance.officer_name}."
+        puts "Please include a description of your interaction with #{@officer_instance.officer_name}."
         review_desc = gets.chomp 
         @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         puts "Thank you #{user_instance.username} for your review of Officer #{@officer_instance.officer_name}"
@@ -94,6 +94,9 @@ class CLI
     def change_rating(user_instance)
         prompt = TTY::Prompt.new
 
+        user_reviews = Review.find_by(user_id: user_instance)
+    
+        if user_reviews
         reviews = Review.all.select {|review| review.user_id == user_instance.id}
         officer_names = reviews.map {|review| review.officer.officer_name}
 
@@ -112,7 +115,9 @@ class CLI
         Review.update(review_id[0], rating: rating, review_desc: review_desc)
 
         puts "You have updated your rating of #{officer_selection} to #{rating}"
-        
+        else
+            puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
+        end
         main_menu(user_instance)
     end
     
@@ -120,7 +125,9 @@ class CLI
     def delete_review(user_instance)
         prompt = TTY::Prompt.new
 
-        reviews = Review.all.select {|review| review.user_id == user_instance.id} #selecting all reviews of officers that match reviews by user
+        user_reviews = Review.find_by(user_id: user_instance)
+        if user_reviews
+            reviews = Review.all.select {|review| review.user_id == user_instance.id} #selecting all reviews of officers that match reviews by user
         officer_names = reviews.map {|review| review.officer.officer_name} #return names as array of strings
         officer =  prompt.select("Please select a review to delete:", officer_names, cycle: true , echo: false, filter: true)#tty menu
         
@@ -132,6 +139,9 @@ class CLI
         Review.destroy(review_id[0]) #deletes review.    
         
         puts "you have deleted your rating of #{officer}"
+        else
+            puts "Itlooks like you do not have any reviews to delete. Lets take you back to the main menu."
+        end
         main_menu(user_instance)
     end
 
