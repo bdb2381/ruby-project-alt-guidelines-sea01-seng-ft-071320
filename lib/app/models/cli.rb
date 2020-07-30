@@ -164,7 +164,7 @@ class CLI
         system "clear"
         puts render_banner
         prompt = TTY::Prompt.new(active_color: :red)
-        menu_choice = prompt.select("Please select from the folowing options".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false) do |menu| 
+        menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
             menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
             menu.choice 'Change a previous review',-> {change_rating(user_instance)}
