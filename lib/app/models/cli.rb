@@ -60,13 +60,16 @@ class CLI
 
 
     def sign_up
-    #     prompt = new_prompt
-    #         menu_choice = prompt.select("Are you sure you want to create a new account?",cycle: true, echo: false) do |menu|
-    #         # prompt_question == "Are you sure you want to create a new account?"
-    #         menu.choice 'Yes',->  
-    #         menu.choice 'no',-> {login_menu}
-    #     end
-    # end
+        # prompt = new_prompt
+        system "clear"
+        puts render_banner
+
+        prompt = TTY::Prompt.new(active_color: :red)
+        menu_choice = prompt.select("Are you sure you want to create a new account?",cycle: true, echo: false) do |menu|
+            # prompt_question == "Are you sure you want to create a new account?"
+            menu.choice 'Yes'  
+            menu.choice 'No, go back to Main Menu',-> {login_menu}
+        end
 
         puts "\n"
         
@@ -99,24 +102,7 @@ class CLI
             menu.choice 'Sign Up',-> {sign_up}
         end
     end
-        # puts "To get started, please enter a username:".blue.bold
-        # username = gets.chomp.downcase.titleize
-        # puts "Please enter a location:".blue.bold
-        # location = gets.chomp.downcase.titleize 
-        
-    #     user_instance = User.find_by(username: username, password: password)
-        
-    #     if user_instance
-    #         puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"    
-    #     else
-    #         gender = gender_menu
-    #         race = demographic_menu
-    #         user_instance = User.create(username: username, location: location, race: race, gender: gender)
-    #         puts "Thanks for setting up an account."    
-    #     end
-    #     sleep 2
-    #     main_menu(user_instance)
-    # end 
+       
     def location_menu
         puts "Please enter your location:".blue.bold
         location = gets.chomp
@@ -198,7 +184,7 @@ class CLI
         puts "#{user_instance.location}\n".red.bold
         puts "\n"
     
-        # if review.user_id == user_instance.id
+     
         reviews = Review.all.select {|review| review.user_id == user_instance.id}
         
         if reviews == []
@@ -241,7 +227,7 @@ class CLI
         sleep 1
         puts "\n"
         puts "Thank you" + " #{user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
-        puts "Who works out of the" + " #{@officer_instance.preicient}".red.bold + ", badge number" + " #{@officer_instance.badge_number}".red.bold 
+        puts "Works out of:" + " #{@officer_instance.preicient}".red.bold + " Badge Number:" + " #{@officer_instance.badge_number}".red.bold 
         puts "You have given them a review of:" + " #{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
         
         go_back_or_repeat("Do you want to submit another rating?", user_instance)
@@ -282,9 +268,7 @@ class CLI
         
         total_reviews = officer_review_selection.map {|review| review.rating}
         avg_rating = total_reviews.sum / total_reviews.length
-        # binding.pry
-
-    
+   
         # User.where(["name = :name and email = :email", { name: "Joe", email: "joe@example.com" }])
 
         puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}".red.bold + "."
