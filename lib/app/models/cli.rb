@@ -164,16 +164,37 @@ class CLI
         system "clear"
         puts render_banner
         prompt = TTY::Prompt.new(active_color: :red)
-        menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false) do |menu| 
+        menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false, per_page: 7) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
             menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
             menu.choice 'Change a previous review',-> {change_rating(user_instance)}
             menu.choice 'Delete previous review',-> {delete_review(user_instance)}
             menu.choice 'Logout',-> {login_menu}
+            menu.choice 'View your profile',-> {view_profile(user_instance)}
             menu.choice 'Exit',-> {exit}
         end
     end
         
+    def view_profile(user_instance)
+        system "clear"
+        prompt = TTY::Prompt.new(active_color: :red)
+        puts render_banner
+
+        puts "#{user_instance.username}"
+        puts "#{user_instance.gender}"
+        puts "#{user_instance.race}"
+        puts "#{user_instance.location}"
+        puts "\n"
+        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+            officer_names = reviews.map {|review| review.officer.officer_name}
+
+            officer_selection =  prompt.select("These are your reviewed officers:".blue.bold, officer_names, cycle: true , echo: false, filter: true, per_page: 8)
+            
+            officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
+            officer_x = Officer.find_by(officer_name: officer_selection)
+
+    end
+
     def rate_officer(user_instance)
         system "clear"
         puts render_banner
