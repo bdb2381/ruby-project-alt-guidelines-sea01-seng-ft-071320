@@ -46,10 +46,12 @@ class CLI
         user_instance = User.find_by(username: username, password: password)
         
         if user_instance
+            puts "\n"
             puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"  
-            sleep 2
+            sleep 3
             main_menu(user_instance)
         else
+            puts "\n"
             puts "Looks like you don't have an account set up with us, let's get you started"
             sleep 3
             sign_up
