@@ -33,39 +33,104 @@ class CLI
         end
     end
 
+    def login 
+        system "clear"
+        puts render_banner
+        prompt = TTY::Prompt.new(active_color: :red)
+        puts "Please enter your username:".blue.bold
+        username = gets.chomp.downcase.titleize
+        password = prompt.mask("Enter your password".blue.bold) 
+        user_instance = User.find_by(username: username, password: password)
+        if user_instance
+            puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"  
+            sleep 2
+            main_menu(user_instance)
+        else
+            puts "Looks like you don't have an account set up with us, let's get you started"
+            sleep 3
+            sign_up
+        end
+    end
+    
+
+
+    def sign_up
+        system "clear"
+        puts render_banner
+        puts "\n"
+        puts "Let's get your account set up!".bold.blue
+        puts "\n"
+        username = create_username
+        puts "\n"
+        password = create_password
+        puts "\n"
+        location = location_menu
+        puts "\n"
+        race = demographic_menu
+        puts "\n"
+        gender = gender_menu
+        puts "\n"
+        user_instance = User.create(username: username, password: password, location: location, race: race, gender: gender)
+        
+        puts "Thanks for setting up an account." 
+        sleep 2
+        main_menu(user_instance)
+    end
+    
     def login_menu
         system "clear"
         puts render_banner
-
-        puts "To get started, please enter a username:".blue.bold
-        username = gets.chomp.downcase.titleize
-        puts "Please enter a location:".blue.bold
-        location = gets.chomp.downcase.titleize 
-        
-        user_instance = User.find_by(username: username, location: location)
-        
-        if user_instance
-            puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"    
-        else
-            gender = gender_menu
-            race = demographic_menu
-            user_instance = User.create(username: username, location: location, race: race, gender: gender)
-            puts "Thanks for setting up an account."    
+        puts "Welcome to Good Cop ? Bad Cop".blue.bold
+        prompt = TTY::Prompt.new(active_color: :red)
+        menu_choice = prompt.select("",cycle: true, echo: false) do |menu| sleep 1
+            menu.choice 'Login', -> {login}
+            menu.choice 'Sign Up',-> {sign_up}
         end
-        sleep 2
-        main_menu(user_instance)
-    end 
+    end
+        # puts "To get started, please enter a username:".blue.bold
+        # username = gets.chomp.downcase.titleize
+        # puts "Please enter a location:".blue.bold
+        # location = gets.chomp.downcase.titleize 
+        
+    #     user_instance = User.find_by(username: username, password: password)
+        
+    #     if user_instance
+    #         puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"    
+    #     else
+    #         gender = gender_menu
+    #         race = demographic_menu
+    #         user_instance = User.create(username: username, location: location, race: race, gender: gender)
+    #         puts "Thanks for setting up an account."    
+    #     end
+    #     sleep 2
+    #     main_menu(user_instance)
+    # end 
+    def location_menu
+        puts "Please enter your location:".blue.bold
+        location = gets.chomp
+    end
 
+    def create_username
+        puts "Please create a username:".blue.bold
+        gets.chomp.downcase.titleize
+    end
+    
+    
+    def create_password
+        prompt = TTY::Prompt.new(active_color: :red)
+        password = prompt.mask("Please create a password:".blue.bold) 
+    end
+    
     def gender_menu
         prompt = TTY::Prompt.new(active_color: :red)
         choices = {"M" => 1, "F" => 2, "Other" => 3, "Prefer not to answer" => 4}
-        gender = prompt.select("Select", choices, cycle: true, echo: false, filter: true)  
+        gender = prompt.select("Select your gender:".blue.bold, choices, cycle: true, echo: false, filter: true)  
     end
 
     def demographic_menu
         prompt = TTY::Prompt.new(active_color: :red)
         choices = {"Black" => 1, "White" => 2, "Asian" => 3, "Hispanic" => 4, "Other" => 5, "Prefer not to answer" => 6}
-        race = prompt.select("What is your race?", choices, cycle: true, echo: false, filter: true) 
+        race = prompt.select("What is your race ?".blue.bold, choices, cycle: true, echo: false, filter: true) 
     end
 
     def get_officer_instance
@@ -79,7 +144,7 @@ class CLI
             menu.choice 'No',-> {main_menu(user_instance)}
         end
     end
-      
+    
     def exit
         system "clear"
         puts render_exit
@@ -128,14 +193,14 @@ class CLI
         
         puts "Thank you" + " #{user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
         puts "Who works in" + " #{@officer_instance.preicient}".red.bold + ", badge number" + " #{@officer_instance.badge_number}".red.bold 
-        puts "You have given them a review of:" + "#{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
+        puts "You have given them a review of:" + " #{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
         
         go_back_or_repeat("Do you want to submit another rating?", user_instance)
     end
     
     def go_back_or_repeat(prompt_question, user_instance)
         prompt = TTY::Prompt.new(active_color: :red)
-    
+        puts "\n"
         prompt.select(prompt_question.blue.bold, cycle: true, echo: false) do |menu| sleep 1
             if prompt_question == "View more average ratings?"
                 menu.choice 'Yes',-> {get_average_rating(user_instance)} 
