@@ -34,10 +34,9 @@ class CLI
     end
 
     def login 
-        system "clear"
-        puts render_banner
-        prompt = TTY::Prompt.new(active_color: :red)
-    
+        prompt = new_prompt
+        
+        
         puts "Please enter your username:".blue.bold
         username = gets.chomp.downcase.titleize
         puts "\n"
@@ -61,9 +60,16 @@ class CLI
 
 
     def sign_up
-        system "clear"
-        puts render_banner
+    #     prompt = new_prompt
+    #         menu_choice = prompt.select("Are you sure you want to create a new account?",cycle: true, echo: false) do |menu|
+    #         # prompt_question == "Are you sure you want to create a new account?"
+    #         menu.choice 'Yes',->  
+    #         menu.choice 'no',-> {login_menu}
+    #     end
+    # end
+
         puts "\n"
+        
         puts "Let's get your account set up!".bold.blue
         puts "\n"
         username = create_username
@@ -84,12 +90,12 @@ class CLI
     end
     
     def login_menu
-        system "clear"
-        puts render_banner
+        
         puts "Welcome to Good Cop ? Bad Cop".blue.bold
-        prompt = TTY::Prompt.new(active_color: :red)
-        menu_choice = prompt.select("",cycle: true, echo: false) do |menu| sleep 1
-            menu.choice 'Login', -> {login}
+        prompt = new_prompt
+        # prompt = TTY::Prompt.new(active_color: :red)
+        menu_choice = prompt.select("",cycle: true, echo: false) do |menu|
+            menu.choice 'Login',-> {login}
             menu.choice 'Sign Up',-> {sign_up}
         end
     end
@@ -118,7 +124,13 @@ class CLI
 
     def create_username
         puts "Please create a username:".blue.bold
-        gets.chomp.downcase.titleize
+        username = gets.chomp.downcase.titleize
+        
+        # if User.exists?(username)
+        #     puts "Looks like #{username} is taken."
+        #     sleep 3
+        #     create_username
+        # end
     end
     
     
@@ -129,13 +141,13 @@ class CLI
     
     def gender_menu
         prompt = TTY::Prompt.new(active_color: :red)
-        choices = {"M" => 1, "F" => 2, "Other" => 3, "Prefer not to answer" => 4}
+        choices = {"M" => "M", "F" => "F", "Other" => "Other", "Prefer not to answer" => "Prefer not to answer"}
         gender = prompt.select("Select your gender:".blue.bold, choices, cycle: true, echo: false, filter: true)  
     end
 
     def demographic_menu
         prompt = TTY::Prompt.new(active_color: :red)
-        choices = {"Black" => 1, "White" => 2, "Asian" => 3, "Hispanic" => 4, "Other" => 5, "Prefer not to answer" => 6}
+        choices = {"Black" => "Black", "White" => "White", "Asian" => "Asian", "Hispanic" => "Hispanic", "Other" => "Other", "Prefer not to answer" => "Prefer not to answer"}
         race = prompt.select("What is your race ?".blue.bold, choices, cycle: true, echo: false, filter: true) 
     end
 
@@ -161,9 +173,7 @@ class CLI
     
     def main_menu(user_instance)
 
-        system "clear"
-        puts render_banner
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
         menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false, per_page: 7) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
             menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
@@ -176,30 +186,37 @@ class CLI
     end
         
     def view_profile(user_instance)
-        system "clear"
-        prompt = TTY::Prompt.new(active_color: :red)
-        puts render_banner
-
-        puts "#{user_instance.username}"
-        puts "#{user_instance.gender}"
-        puts "#{user_instance.race}"
-        puts "#{user_instance.location}"
+        prompt = new_prompt
+        # binding.pry
+        puts "Username:"
+        puts "#{user_instance.username}\n".red.bold
+        puts "Gender:"
+        puts "#{user_instance.gender}\n".red.bold
+        puts "Race:"
+        puts "#{user_instance.race}\n".red.bold
+        puts "Location:"
+        puts "#{user_instance.location}\n".red.bold
         puts "\n"
+    
+        # if review.user_id == user_instance.id
         reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        
+        if reviews == []
+            puts "Looks like you don't have any reviews at this time."
+        else
             officer_names = reviews.map {|review| review.officer.officer_name}
 
             officer_selection =  prompt.select("These are your reviewed officers:".blue.bold, officer_names, cycle: true , echo: false, filter: true, per_page: 8)
             
             officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
             officer_x = Officer.find_by(officer_name: officer_selection)
-
+            
+        end
+        go_back_or_repeat("", user_instance)
     end
 
     def rate_officer(user_instance)
-        system "clear"
-        puts render_banner
-        
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
         
         officer_choices = get_officer_instance
         officer = prompt.select("Choose an officer to rate:".blue.bold, officer_choices, cycle: true , echo: false, filter: true).chomp
@@ -246,15 +263,15 @@ class CLI
             elsif prompt_question == "Do you want to submit another rating?"
                 menu.choice 'Yes',-> {rate_officer(user_instance)} 
                 menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
-                
+            elsif prompt_question == ""
+                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
             end
+
         end    
     end
     
     def get_average_rating  (user_instance)
-        system "clear"
-        puts render_banner
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
         
         officer_choices = get_officer_instance
         officer = prompt.select("Choose an officer to veiw their average rating:".blue.bold, officer_choices, cycle: true , echo: false, filter: true)
@@ -265,22 +282,20 @@ class CLI
         
         total_reviews = officer_review_selection.map {|review| review.rating}
         avg_rating = total_reviews.sum / total_reviews.length
+        # binding.pry
 
-        puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}.".red.bold + " and a description of:" + " #{review_desc}".red.bold
+    
+        # User.where(["name = :name and email = :email", { name: "Joe", email: "joe@example.com" }])
+
+        puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}".red.bold + "."
 
         sleep 1
-        go_back_or_repeat("View more average ratings?",user_instance)
-
-        
-        
-        
+        go_back_or_repeat("View more average ratings?",user_instance) 
     end
 
     
     def change_rating(user_instance)
-        system "clear"
-        puts render_banner
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
 
         user_reviews = Review.find_by(user_id: user_instance)
     
@@ -316,18 +331,13 @@ class CLI
         else
             puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
         end
-        
         sleep 1
         go_back_or_repeat("Do you want to update another review?", user_instance)
-
-        
     end
     
 
     def delete_review(user_instance)
-        system "clear"
-        puts render_banner
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
 
         user_reviews = Review.find_by(user_id: user_instance)
         if user_reviews
@@ -350,13 +360,9 @@ class CLI
         else
             puts "You do not have any reviews to delete. Lets take you back to the main menu."
         end
-        
         sleep 1
 
         go_back_or_repeat("Do you want to delete another review?", user_instance)  
-        
-        
-        
     end
 
 end #END OF CLASS
