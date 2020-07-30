@@ -110,7 +110,7 @@ class CLI
         puts "You chose:" + " #{@officer_instance.officer_name}".red.bold  
         puts "Please rate your interaction with the Officer.".blue.bold
         rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
-        puts "_____________________________________________________"
+        
         puts "Please include a description of your interaction with".blue.bold + " #{@officer_instance.officer_name}".red.bold + ":".blue.bold
         review_desc = gets.chomp 
 
@@ -127,22 +127,28 @@ class CLI
         main_menu(user_instance)
     end
 
-#    def go_back_or_repeat(prompt_question, user_instance, method_to_select) #, method_to_repeat)
-#     prompt = TTY::Prompt.new(active_color: :red)
+   def go_back_or_repeat(prompt_question, user_instance) #, method_to_repeat)
+    prompt = TTY::Prompt.new(active_color: :red)
     
-#     if method_to_select ==  "get_avg_rating" || "delete_rating" ||
-#         prompt.select("prompt_question", cycle: true, echo: false) do |menu| sleep 1
-#             menu.choice 'Yes',-> {get_average_rating(user_instance)} 
-#             menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
-            
-            
-#             end
-#     end
+        prompt.select(prompt_question, cycle: true, echo: false) do |menu| sleep 1
+            if prompt_question == "View more average ratings?"
+                menu.choice 'Yes',-> {get_average_rating(user_instance)} 
+                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+            elsif prompt_question == "Do you want to update another review?"
+                menu.choice 'Yes',-> {change_rating(user_instance)} 
+                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+            elsif prompt_question == "Do you want to delete another review?"
+                menu.choice 'Yes',-> {delete_review(user_instance)} 
+                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+            end
+        end    
+    end
+    
     
         
     
 
-    def get_average_rating(user_instance)
+    def get_average_rating  (user_instance)
         system "clear"
         puts render_banner
         prompt = TTY::Prompt.new(active_color: :red)
@@ -158,13 +164,13 @@ class CLI
 
         puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}.".red.bold
 
-        sleep 2
-        # go_back_or_repeat("Do you want to see another review?",user_instance, "get_avg_rating"  )
+        sleep 1
+        go_back_or_repeat("View more average ratings?",user_instance)
 
-        prompt.select("Do you want to see another review?".blue.bold, cycle: true, echo: false) do |menu| sleep 1
-            menu.choice 'Yes',-> {get_average_rating(user_instance)} 
-            menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
-        end
+        # prompt.select("Do you want to see another review?".blue.bold, cycle: true, echo: false) do |menu| sleep 1
+        #     menu.choice 'Yes',-> {get_average_rating(user_instance)} 
+        #     menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+        # end
         
         
         
@@ -206,11 +212,13 @@ class CLI
             puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
         end
         
-        sleep 2
-        prompt.select("Do you want to update another review?".blue.bold, cycle: true, echo: false) do |menu| 
-            menu.choice 'Yes',-> {change_rating(user_instance)} 
-            menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
-        end
+        sleep 1
+        go_back_or_repeat("Do you want to update another review?", user_instance)
+
+        # prompt.select("Do you want to update another review?".blue.bold, cycle: true, echo: false) do |menu| 
+        #     menu.choice 'Yes',-> {change_rating(user_instance)} 
+        #     menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+        # end
     end
     
 
@@ -235,20 +243,22 @@ class CLI
 
             Review.destroy(review_id[0]) #deletes review.    
 
-            sleep 1
+            
 
             puts "You have deleted your rating of:" " #{officer}".red.bold
         else
-            sleep 1
+           
 
             puts "It looks like you do not have any reviews to delete. Lets take you back to the main menu."
         end
         sleep 2
 
-        prompt.select("Do you want to delete another review?".blue.bold, cycle: true, echo: false) do |menu| 
-            menu.choice 'Yes',-> {delete_review(user_instance)} 
-            menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
-        end
+        go_back_or_repeat("Do you want to delete another review?", user_instance)  
+        
+        # prompt.select("Do you want to delete another review?".blue.bold, cycle: true, echo: false) do |menu| 
+        #     menu.choice 'Yes',-> {delete_review(user_instance)} 
+        #     menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+        # end
         
     end
 
