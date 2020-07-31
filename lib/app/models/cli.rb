@@ -7,31 +7,40 @@ class CLI
         sleep 5
         login_menu
     end
+    
+    render_ascii_art
+    
+    
+    render_banner
+    
 
-    def render_ascii_art
-        File.readlines("ascii.txt") do |line|
-            puts line
-        end
-    end
+     render_exit
     
-    def render_banner
-        puts "\n\n"
-        puts '                            __                       ___       __              __                   '.red. bold                                                  
-        puts '     ____ _____  ____  ____/ /  _________  ____     /__ \     / /_  ____ _____/ /  _________  ____  '.red.bold
-        puts '    / __ `/ __ \/ __ \/ __  /  / ___/ __ \/ __ \     / _/    / __ \/ __ `/ __  /  / ___/ __ \/ __ \ '.red.bold
-        puts '   / /_/ / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ /    /_/     / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ / '.blue.bold
-        puts '   \__, /\____/\____/\__,_/   \___/\____/ .___/    (_)     /_.___/\__,_/\__,_/   \___/\____/ .___/ '.blue.bold
-        puts "   ____/                               /_/                                                /_/      \n\n".blue.bold
-        # puts '  *************************************************************************************************'.bold
-        # puts '  *************************************************************************************************'.bold
-        puts '  *************************************************************************************************'.bold
-    end
     
-    def render_exit
-        File.readlines("exit.txt") do |line|
-            puts line
-        end
-    end
+    # def render_ascii_art
+    #     File.readlines("ascii.txt") do |line|
+    #         puts line
+    #     end
+    # end
+    
+    # def render_banner
+    #     puts "\n\n"
+    #     puts '                            __                       ___       __              __                   '.red. bold                                                  
+    #     puts '     ____ _____  ____  ____/ /  _________  ____     /__ \     / /_  ____ _____/ /  _________  ____  '.red.bold
+    #     puts '    / __ `/ __ \/ __ \/ __  /  / ___/ __ \/ __ \     / _/    / __ \/ __ `/ __  /  / ___/ __ \/ __ \ '.red.bold
+    #     puts '   / /_/ / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ /    /_/     / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ / '.blue.bold
+    #     puts '   \__, /\____/\____/\__,_/   \___/\____/ .___/    (_)     /_.___/\__,_/\__,_/   \___/\____/ .___/ '.blue.bold
+    #     puts "   ____/                               /_/                                                /_/      \n\n".blue.bold
+    #     # puts '  *************************************************************************************************'.bold
+    #     # puts '  *************************************************************************************************'.bold
+    #     puts '  *************************************************************************************************'.bold
+    # end
+    
+    # def render_exit
+    #     File.readlines("exit.txt") do |line|
+    #         puts line
+    #     end
+    # end
 
     def login 
         prompt = new_prompt
@@ -93,7 +102,6 @@ class CLI
     end
     
     def login_menu
-        
         puts "Welcome to Good Cop ? Bad Cop".blue.bold
         prompt = new_prompt
         # prompt = TTY::Prompt.new(active_color: :red)
