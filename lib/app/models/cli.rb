@@ -243,38 +243,41 @@ class CLI
     
     def change_rating
         prompt = new_prompt
-
+        
         user_reviews = Review.find_by(user_id: @user_instance)
-    
+        
         if user_reviews
             reviews = Review.all.select {|review| review.user_id == @user_instance.id}
             officer_names = reviews.map {|review| review.officer.officer_name}
-
             officer_selection =  prompt.select("Please select your review to update:".blue.bold, officer_names, cycle: true , echo: false, filter: true)
-            
+
             officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
             officer_x = Officer.find_by(officer_name: officer_selection)
+           
             puts "\n"
-            
             puts "Please update your rating for:".blue.bold + " #{officer_selection}".red.bold
             puts "\n"
             rating = prompt.slider("Rating", max: 10, step: 0.5, default: 0, format: "|:slider| %.1f")
             sleep 1
-            puts "\n"
             
+            puts "\n"
             puts "Please include a description of your interaction with:".blue.bold + " #{officer_x.rank} #{officer_x.officer_name}".red.bold
             review_desc = gets.chomp
+            
             puts "\n"
-        
             review_id = officer_review.map {|review| review.id}
-
             puts "Are you sure you want to submit this updated review?".blue.bold
             are_you_sure
+            
             puts "\n"
+            @review_instance =  Review.update(review_id[0], rating: rating, review_desc: review_desc)
+            sleep 1
             
-            Review.update(review_id[0], rating: rating, review_desc: review_desc)
-            
-            puts "You have updated your review of:".blue.bold + " #{officer_selection}".red.bold + " to".blue.bold + " #{rating}".red.bold
+            puts "\n"
+            puts "Thank you" + " #{@user_instance.username}".red.bold + " for your review of" + " #{officer_x.rank}".red.bold + " #{officer_x.officer_name}".red.bold + "."
+            puts "Works out of:" + " #{officer_x.preicient}".red.bold + " Badge Number:" + " #{officer_x.badge_number}".red.bold 
+            puts "You have given them a review of:" + " #{@review_instance.rating}/10".red.bold + " and a description of:" + " #{@review_instance.review_desc}".red.bold
+        
         else
             puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
         end
