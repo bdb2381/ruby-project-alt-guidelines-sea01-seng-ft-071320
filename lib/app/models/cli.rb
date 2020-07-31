@@ -190,7 +190,7 @@ class CLI
         @review_instance = Review.create(user: @user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         sleep 1
         puts "\n"
-        puts "Thank you" + " #@user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
+        puts "Thank you" + " #{@user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
         puts "Works out of:" + " #{@officer_instance.preicient}".red.bold + " Badge Number:" + " #{@officer_instance.badge_number}".red.bold 
         puts "You have given them a review of:" + " #{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
         
