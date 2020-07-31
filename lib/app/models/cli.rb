@@ -43,7 +43,7 @@ class CLI
         prompt = new_prompt
         menu_choice = prompt.select("Are you sure you want to create a new account?",cycle: true, echo: false) do |menu|
             menu.choice 'Yes'  
-            menu.choice 'No, go back to Main Menu',-> {login_menu}
+            menu.choice 'No, go back to the login menu',-> {login_menu}
         end
 
         puts "\n"
@@ -119,7 +119,7 @@ class CLI
     def exit
         system "clear"
         puts render_exit
-        sleep 3.5
+        sleep 4
         system "clear"
         exit!
     end
@@ -190,8 +190,8 @@ class CLI
         @review_instance = Review.create(user: @user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         sleep 1
         puts "\n"
-        puts "Thank you" + " #{@user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
-        puts "Works out of:" + " #{@officer_instance.preicient}".red.bold + " Badge Number:" + " #{@officer_instance.badge_number}".red.bold 
+        puts "Thank you" + " #{@user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + ","
+        puts "who works out of the:" + " #{@officer_instance.preicient}".red.bold + " precinct." + " Badge Number:" + " #{@officer_instance.badge_number}".red.bold 
         puts "You have given them a review of:" + " #{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
         
         go_back_or_repeat("Do you want to submit another rating?")
@@ -232,8 +232,9 @@ class CLI
         
         total_reviews = officer_review_selection.map {|review| review.rating}
         avg_rating = total_reviews.sum / total_reviews.length
+        avg_rating.round(2)
 
-        puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}".red.bold + "."
+        puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating.round(1)}".red.bold + "."
 
         sleep 1
         go_back_or_repeat("View more average ratings?") 
