@@ -5,8 +5,9 @@
 
 Within our app users will be allowed to create reviews through a numerical rating system, and incoorperate a comprehensive description of their interaction with a police officer. In addition, citizens can view police officers' average ratings other citizens have submitted.
 
-If you or anybody you know has had an issue with police brutality and SPD please report it :
+If you or anybody you know has had an issue with police brutality and SPD please report it 
 [here](https://www.seattle.gov/oig/feedback)
+
 ---
 ### SECURITY :
 
