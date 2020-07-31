@@ -13,7 +13,7 @@ class CLI
     render_exit
     
     
-
+# login 
     def login 
         prompt = new_prompt
                 
@@ -22,13 +22,13 @@ class CLI
         puts "\n"
         
         password = prompt.mask("Enter your password".blue.bold) 
-        user_instance = User.find_by(username: username, password: password)
+        @user_instance = User.find_by(username: username, password: password)
         
-        if user_instance
+        if @user_instance
             puts "\n"
             puts "Welcome back looks like you already have an acount with us, lets take you to the Main Menu"  
             sleep 3
-            main_menu(user_instance)
+            main_menu
         else
             puts "\n"
             puts "Looks like you don't have an account set up with us, let's get you started"
@@ -60,11 +60,11 @@ class CLI
         puts "\n"
         gender = gender_menu
         puts "\n"
-        user_instance = User.create(username: username, password: password, location: location, race: race, gender: gender)
+       @user_instance = User.create(username: username, password: password, location: location, race: race, gender: gender)
         
         puts "Thanks for setting up an account." 
         sleep 3
-        main_menu(user_instance)
+        main_menu
     end
     
     def login_menu
@@ -108,11 +108,11 @@ class CLI
         Officer.all.collect{|officer| officer.officer_name} 
     end
 
-    def are_you_sure(user_instance)
+    def are_you_sure
         prompt = TTY::Prompt.new(active_color: :red)
         menu_choice = prompt.select("",cycle: true, echo: false) do |menu| sleep 1
             menu.choice 'Yes'
-            menu.choice 'No',-> {main_menu(user_instance)}
+            menu.choice 'No',-> {main_menu}
         end
     end
     
@@ -124,48 +124,48 @@ class CLI
         exit!
     end
     
-    def main_menu(user_instance)
+    def main_menu
         prompt = new_prompt
-        menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false, per_page: 7) do |menu| 
-            menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
-            menu.choice 'View officer average rating',-> {get_average_rating(user_instance)}
-            menu.choice 'Change a previous review',-> {change_rating(user_instance)}
-            menu.choice 'Delete previous review',-> {delete_review(user_instance)}
+        menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{@user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false, per_page: 7) do |menu| 
+            menu.choice 'Rate an officer',-> {rate_officer}
+            menu.choice 'View officer average rating',-> {get_average_rating}
+            menu.choice 'Change a previous review',-> {change_rating}
+            menu.choice 'Delete previous review',-> {delete_review}
             menu.choice 'Logout',-> {login_menu}
-            menu.choice 'View your profile',-> {view_profile(user_instance)}
+            menu.choice 'View your profile',-> {view_profile}
             menu.choice 'Exit',-> {exit}
         end
     end
         
-    def view_profile(user_instance)
+    def view_profile
         prompt = new_prompt
         puts "Username:"
-        puts "#{user_instance.username}\n".red.bold
+        puts "#{@user_instance.username}\n".red.bold
         puts "Gender:"
-        puts "#{user_instance.gender}\n".red.bold
+        puts "#{@user_instance.gender}\n".red.bold
         puts "Race:"
-        puts "#{user_instance.race}\n".red.bold
+        puts "#{@user_instance.race}\n".red.bold
         puts "Location:"
-        puts "#{user_instance.location}\n".red.bold
+        puts "#{@user_instance.location}\n".red.bold
         puts "\n"
     
-        reviews = Review.all.select {|review| review.user_id == user_instance.id}
+        reviews = Review.all.select {|review| review.user_id == @user_instance.id}
         
         if reviews == []
             puts "Looks like you don't have any reviews at this time."
         else
             officer_names = reviews.map {|review| review.officer.officer_name}
 
-            officer_selection =  prompt.select("These are your reviewed officers:".blue.bold, officer_names, cycle: true , echo: false, filter: true, per_page: 8)
+            officer_selection =  prompt.select("You have reviewed these officers:".blue.bold, officer_names, cycle: true , echo: false, filter: true, per_page: 8)
             
             officer_review = reviews.select {|review| review.officer.officer_name == officer_selection}
             officer_x = Officer.find_by(officer_name: officer_selection)
             
         end
-        go_back_or_repeat("", user_instance)
+        go_back_or_repeat("")
     end
 
-    def rate_officer(user_instance)
+    def rate_officer
         prompt = new_prompt
         
         officer_choices = get_officer_instance
@@ -185,42 +185,42 @@ class CLI
         
         puts "\n"
         puts "Are you sure you want to submit this review?".blue.bold
-        are_you_sure(user_instance)
+        are_you_sure
 
-        @review_instance = Review.create(user: user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
+        @review_instance = Review.create(user: @user_instance, officer: @officer_instance, rating: rating, review_desc: review_desc)
         sleep 1
         puts "\n"
-        puts "Thank you" + " #{user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
+        puts "Thank you" + " #@user_instance.username}".red.bold + " for your review of" + " #{@officer_instance.rank}".red.bold + " #{@officer_instance.officer_name}".red.bold + "."
         puts "Works out of:" + " #{@officer_instance.preicient}".red.bold + " Badge Number:" + " #{@officer_instance.badge_number}".red.bold 
         puts "You have given them a review of:" + " #{rating}/10".red.bold + " and a description of:" + " #{review_desc}".red.bold
         
-        go_back_or_repeat("Do you want to submit another rating?", user_instance)
+        go_back_or_repeat("Do you want to submit another rating?")
     end
     
-    def go_back_or_repeat(prompt_question, user_instance)
+    def go_back_or_repeat(prompt_question)
         prompt = TTY::Prompt.new(active_color: :red)
         puts "\n"
         prompt.select(prompt_question.blue.bold, cycle: true, echo: false) do |menu| sleep 1
             if prompt_question == "View more average ratings?"
-                menu.choice 'Yes',-> {get_average_rating(user_instance)} 
-                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+                menu.choice 'Yes',-> {get_average_rating} 
+                menu.choice 'Back to Main Menu',-> {main_menu}
             elsif prompt_question == "Do you want to update another review?"
-                menu.choice 'Yes',-> {change_rating(user_instance)} 
-                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+                menu.choice 'Yes',-> {change_rating} 
+                menu.choice 'Back to Main Menu',-> {main_menu}
             elsif prompt_question == "Do you want to delete another review?"
-                menu.choice 'Yes',-> {delete_review(user_instance)} 
-                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+                menu.choice 'Yes',-> {delete_review} 
+                menu.choice 'Back to Main Menu',-> {main_menu}
             elsif prompt_question == "Do you want to submit another rating?"
-                menu.choice 'Yes',-> {rate_officer(user_instance)} 
-                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+                menu.choice 'Yes',-> {rate_officer} 
+                menu.choice 'Back to Main Menu',-> {main_menu}
             elsif prompt_question == ""
-                menu.choice 'Back to Main Menu',-> {main_menu(user_instance)}
+                menu.choice 'Back to Main Menu',-> {main_menu}
             end
 
         end    
     end
     
-    def get_average_rating  (user_instance)
+    def get_average_rating  
         prompt = new_prompt
         
         officer_choices = get_officer_instance
@@ -236,17 +236,17 @@ class CLI
         puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}".red.bold + "."
 
         sleep 1
-        go_back_or_repeat("View more average ratings?",user_instance) 
+        go_back_or_repeat("View more average ratings?") 
     end
 
     
-    def change_rating(user_instance)
+    def change_rating
         prompt = new_prompt
 
-        user_reviews = Review.find_by(user_id: user_instance)
+        user_reviews = Review.find_by(user_id: @user_instance)
     
         if user_reviews
-            reviews = Review.all.select {|review| review.user_id == user_instance.id}
+            reviews = Review.all.select {|review| review.user_id == @user_instance.id}
             officer_names = reviews.map {|review| review.officer.officer_name}
 
             officer_selection =  prompt.select("Please select your review to update:".blue.bold, officer_names, cycle: true , echo: false, filter: true)
@@ -268,7 +268,7 @@ class CLI
             review_id = officer_review.map {|review| review.id}
 
             puts "Are you sure you want to submit this updated review?".blue.bold
-            are_you_sure(user_instance)
+            are_you_sure
             puts "\n"
             
             Review.update(review_id[0], rating: rating, review_desc: review_desc)
@@ -279,16 +279,16 @@ class CLI
         end
        
         sleep 1
-        go_back_or_repeat("Do you want to update another review?", user_instance)
+        go_back_or_repeat("Do you want to update another review?")
     end
     
 
-    def delete_review(user_instance)
+    def delete_review
         prompt = new_prompt
 
-        user_reviews = Review.find_by(user_id: user_instance)
+        user_reviews = Review.find_by(user_id: @user_instance)
         if user_reviews
-            reviews = Review.all.select {|review| review.user_id == user_instance.id} #selecting all reviews of officers that match reviews by user
+            reviews = Review.all.select {|review| review.user_id == @user_instance.id} #selecting all reviews of officers that match reviews by user
             officer_names = reviews.map {|review| review.officer.officer_name} #return names as array of strings
             officer =  prompt.select("Please select a review to delete:".blue.bold, officer_names, cycle: true , echo: false, filter: true)#tty menu
             puts "\n"
@@ -299,7 +299,7 @@ class CLI
             puts "\n"
         
             puts "Are you sure you want to delete this review?".blue.bold
-            are_you_sure(user_instance)
+            are_you_sure
             puts "\n"
             
             Review.destroy(review_id[0]) #deletes review.    
@@ -309,7 +309,7 @@ class CLI
         end
         sleep 1
 
-        go_back_or_repeat("Do you want to delete another review?", user_instance)  
+        go_back_or_repeat("Do you want to delete another review?")  
     end
 
 end #END OF CLASS
