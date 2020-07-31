@@ -9,43 +9,14 @@ class CLI
     end
     
     render_ascii_art
-    
-    
     render_banner
-    
-
-     render_exit
+    render_exit
     
     
-    # def render_ascii_art
-    #     File.readlines("ascii.txt") do |line|
-    #         puts line
-    #     end
-    # end
-    
-    # def render_banner
-    #     puts "\n\n"
-    #     puts '                            __                       ___       __              __                   '.red. bold                                                  
-    #     puts '     ____ _____  ____  ____/ /  _________  ____     /__ \     / /_  ____ _____/ /  _________  ____  '.red.bold
-    #     puts '    / __ `/ __ \/ __ \/ __  /  / ___/ __ \/ __ \     / _/    / __ \/ __ `/ __  /  / ___/ __ \/ __ \ '.red.bold
-    #     puts '   / /_/ / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ /    /_/     / /_/ / /_/ / /_/ /  / /__/ /_/ / /_/ / '.blue.bold
-    #     puts '   \__, /\____/\____/\__,_/   \___/\____/ .___/    (_)     /_.___/\__,_/\__,_/   \___/\____/ .___/ '.blue.bold
-    #     puts "   ____/                               /_/                                                /_/      \n\n".blue.bold
-    #     # puts '  *************************************************************************************************'.bold
-    #     # puts '  *************************************************************************************************'.bold
-    #     puts '  *************************************************************************************************'.bold
-    # end
-    
-    # def render_exit
-    #     File.readlines("exit.txt") do |line|
-    #         puts line
-    #     end
-    # end
 
     def login 
         prompt = new_prompt
-        
-        
+                
         puts "Please enter your username:".blue.bold
         username = gets.chomp.downcase.titleize
         puts "\n"
@@ -69,13 +40,8 @@ class CLI
 
 
     def sign_up
-        # prompt = new_prompt
-        system "clear"
-        puts render_banner
-
-        prompt = TTY::Prompt.new(active_color: :red)
+        prompt = new_prompt
         menu_choice = prompt.select("Are you sure you want to create a new account?",cycle: true, echo: false) do |menu|
-            # prompt_question == "Are you sure you want to create a new account?"
             menu.choice 'Yes'  
             menu.choice 'No, go back to Main Menu',-> {login_menu}
         end
@@ -104,7 +70,7 @@ class CLI
     def login_menu
         puts "Welcome to Good Cop ? Bad Cop".blue.bold
         prompt = new_prompt
-        # prompt = TTY::Prompt.new(active_color: :red)
+        
         menu_choice = prompt.select("",cycle: true, echo: false) do |menu|
             menu.choice 'Login',-> {login}
             menu.choice 'Sign Up',-> {sign_up}
@@ -119,14 +85,7 @@ class CLI
     def create_username
         puts "Please create a username:".blue.bold
         username = gets.chomp.downcase.titleize
-        
-        # if User.exists?(username)
-        #     puts "Looks like #{username} is taken."
-        #     sleep 3
-        #     create_username
-        # end
     end
-    
     
     def create_password
         prompt = TTY::Prompt.new(active_color: :red)
@@ -166,7 +125,6 @@ class CLI
     end
     
     def main_menu(user_instance)
-
         prompt = new_prompt
         menu_choice = prompt.select("Please select from the folowing options,".blue.bold + " #{user_instance.username}".red.bold + ":".blue.bold, cycle: true, echo: false, per_page: 7) do |menu| 
             menu.choice 'Rate an officer',-> {rate_officer(user_instance)}
@@ -181,7 +139,6 @@ class CLI
         
     def view_profile(user_instance)
         prompt = new_prompt
-        # binding.pry
         puts "Username:"
         puts "#{user_instance.username}\n".red.bold
         puts "Gender:"
@@ -192,7 +149,6 @@ class CLI
         puts "#{user_instance.location}\n".red.bold
         puts "\n"
     
-     
         reviews = Review.all.select {|review| review.user_id == user_instance.id}
         
         if reviews == []
@@ -276,8 +232,6 @@ class CLI
         
         total_reviews = officer_review_selection.map {|review| review.rating}
         avg_rating = total_reviews.sum / total_reviews.length
-   
-        # User.where(["name = :name and email = :email", { name: "Joe", email: "joe@example.com" }])
 
         puts "Officer" + " #{@officer_instance.officer_name}".red.bold + " has a average rating of" + " #{avg_rating}".red.bold + "."
 
@@ -323,6 +277,7 @@ class CLI
         else
             puts "It looks like you have not made any reviews yet. Lets take you back to the main menu."
         end
+       
         sleep 1
         go_back_or_repeat("Do you want to update another review?", user_instance)
     end
